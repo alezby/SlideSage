@@ -20,7 +20,6 @@ export default function ChatTab() {
     isChatting,
     setIsChatting,
     setComments,
-    comments,
   } = useDashboard();
   const { toast } = useToast();
   const [userInput, setUserInput] = useState('');
@@ -49,6 +48,17 @@ export default function ChatTab() {
       });
       return;
     }
+    
+    const accessToken = sessionStorage.getItem('google_access_token');
+    if (!accessToken) {
+        toast({
+            title: 'Authentication Error',
+            description: 'Google access token not found. Please sign in again.',
+            variant: 'destructive'
+        });
+        return;
+    }
+
 
     const newUserMessage: ChatMessage = { role: 'user', content: userInput };
     const newHistory = [...chatHistory, newUserMessage];
@@ -63,6 +73,9 @@ export default function ChatTab() {
         slideContent: `${currentSlide.title}\n${currentSlide.content}`,
         analysisPrompt,
         history: chatHistory,
+        presentationId: selectedPresentation.id,
+        slideId: currentSlide.id,
+        accessToken,
       });
 
       // Update chat history with the agent's response
@@ -73,7 +86,7 @@ export default function ChatTab() {
       if (result.commentAdded) {
         setComments(prevComments => [...prevComments, result.commentAdded!].sort((a,b) => a.slideNumber - b.slideNumber));
         toast({
-          title: 'Comment Added',
+          title: 'Comment Added to Google Slide',
           description: `A new comment was added to slide ${result.commentAdded.slideNumber}.`,
         });
       }

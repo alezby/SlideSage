@@ -8,6 +8,7 @@
  */
 
 import { ai } from '@/ai/genkit';
+import { addCommentToSlide as addCommentToSlideService } from '@/services/google-slides';
 import { z } from 'genkit';
 
 // Define the schema for a single comment object
@@ -25,6 +26,9 @@ const ConversationalAgentInputSchema = z.object({
   slideNumber: z.number().describe('The current slide number being viewed.'),
   slideContent: z.string().describe('The text content of the current slide.'),
   analysisPrompt: z.string().describe('The overall analysis goal set by the user.'),
+  presentationId: z.string().describe('The ID of the Google Slides presentation.'),
+  slideId: z.string().describe('The ID of the current slide page object.'),
+  accessToken: z.string().describe('The Google OAuth2 access token for API calls.'),
 });
 export type ConversationalAgentInput = z.infer<typeof ConversationalAgentInputSchema>;
 
@@ -43,18 +47,29 @@ export async function conversationalAgent(input: ConversationalAgentInput): Prom
 const addCommentToSlideTool = ai.defineTool(
   {
     name: 'addCommentToSlide',
-    description: 'Adds a comment to a specific slide in the presentation.',
+    description: 'Adds a comment to a specific slide in the presentation. This is the only tool available.',
     inputSchema: z.object({
-      slideNumber: z.number().describe('The slide number to add the comment to. This should be the current slide number.'),
       commentText: z.string().describe('The constructive feedback or comment to add to the slide.'),
     }),
     outputSchema: z.string(),
   },
-  async ({ slideNumber, commentText }) => {
-    // In a real application, this would call the Google Slides API to add a comment.
-    // For this demo, we will simulate this by returning the comment data.
-    // The flow will then pass this back to the client.
-    return `Successfully added comment to slide ${slideNumber}.`;
+  async ({ commentText }, context) => {
+    if (!context || !context.auth) {
+      throw new Error('User authentication context is required to add a comment.');
+    }
+    const { presentationId, slideId, accessToken } = context.auth as ConversationalAgentInput;
+
+    if (!presentationId || !slideId || !accessToken) {
+      return 'Error: Missing presentation, slide, or authentication details.';
+    }
+    
+    try {
+      await addCommentToSlideService(accessToken, presentationId, slideId, commentText);
+      return `Successfully added comment to slide.`;
+    } catch (e: any) {
+      console.error("Tool execution failed:", e);
+      return `Failed to add comment. Error: ${e.message}`;
+    }
   }
 );
 
@@ -72,14 +87,22 @@ const conversationalAgentFlow = ai.defineFlow(
       prompt: `You are a presentation assistant. The user wants you to help them improve their presentation based on this goal: "${input.analysisPrompt}".
       The user is currently viewing Slide ${input.slideNumber}, which contains: "${input.slideContent}".
       Your job is to answer the user's questions and, if asked, use the addCommentToSlide tool to add comments to the current slide.
-      Only use the tool if the user explicitly asks to add a comment or note. When you use the tool, respond with a confirmation message.`,
+      Only use the tool if the user explicitly asks to add a comment or note. When you use the tool, respond with a confirmation message that the comment was added.
+      When asked to add a comment, do not ask for confirmation, just add it.`,
       model: 'googleai/gemini-2.5-flash',
       history: input.history,
       tools: [addCommentToSlideTool],
       config: {
-        // Lower temperature for more predictable, less creative responses when using tools
         temperature: 0.1,
       },
+      // Pass required info for the tool to the context
+      context: {
+        auth: {
+          presentationId: input.presentationId,
+          slideId: input.slideId,
+          accessToken: input.accessToken,
+        }
+      }
     });
 
     let commentAdded: z.infer<typeof CommentSchema> | undefined = undefined;
@@ -89,13 +112,13 @@ const conversationalAgentFlow = ai.defineFlow(
       for (const toolRequest of toolRequests) {
         if (toolRequest.name === 'addCommentToSlide') {
           // Get the arguments the model wants to call the tool with.
-          const { slideNumber, commentText } = toolRequest.input;
+          const { commentText } = toolRequest.input;
 
-          // Call the tool. In this simulation, it doesn't do anything but return a string.
+          // Call the tool. This will execute the function defined in `ai.defineTool`.
           await toolRequest.run();
 
-          // Prepare the comment to be sent back to the client UI.
-          commentAdded = { slideNumber, commentText };
+          // Prepare the comment to be sent back to the client UI for optimistic update.
+          commentAdded = { slideNumber: input.slideNumber, commentText };
         }
       }
     }

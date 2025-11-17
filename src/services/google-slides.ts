@@ -19,6 +19,51 @@ function extractTextFromPage(page: any): string {
     return text.replace(/\s+/g, ' ').trim();
 }
 
+export async function addCommentToSlide(
+  token: string,
+  presentationId: string,
+  slideId: string,
+  commentText: string
+): Promise<void> {
+  const url = `${SLIDES_API_URL}/${presentationId}:batchUpdate`;
+  
+  const requests = [
+    {
+      createComment: {
+        objectId: slideId,
+        comment: {
+          text: {
+            textElements: [
+              {
+                textRun: {
+                  content: commentText,
+                },
+              },
+            ],
+          },
+        },
+      },
+    },
+  ];
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ requests }),
+  });
+
+  if (!response.ok) {
+    const errorBody = await response.json();
+    console.error('Failed to add comment to slide:', errorBody);
+    throw new Error('Failed to add comment to slide.');
+  }
+
+  console.log('Comment added successfully.');
+}
+
 
 export async function getPresentations(token: string): Promise<Presentation[]> {
   const response = await fetch(

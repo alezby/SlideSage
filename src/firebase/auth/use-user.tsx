@@ -8,7 +8,7 @@ import {
 } from 'firebase/auth';
 import { useAuth } from '@/firebase/provider';
 
-const SLIDES_SCOPE = 'https://www.googleapis.com/auth/presentations.readonly';
+const SLIDES_SCOPE = 'https://www.googleapis.com/auth/presentations'; // Changed from .readonly
 const DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.readonly';
 
 export function useUser() {
