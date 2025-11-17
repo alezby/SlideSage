@@ -37,13 +37,17 @@ export default function Home() {
       const provider = new GoogleAuthProvider();
       try {
         await signInWithPopup(auth, provider);
-        router.push('/dashboard');
+        // The useEffect hook will handle the redirect
       } catch (error) {
         console.error('Error signing in with Google', error);
       }
     }
   };
 
+  if (user) {
+    return null; // Don't render anything while redirecting
+  }
+  
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md shadow-lg">
