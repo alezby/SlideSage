@@ -30,6 +30,10 @@ export function useUser() {
     const provider = new GoogleAuthProvider();
     provider.addScope(SLIDES_SCOPE);
     provider.addScope(DRIVE_SCOPE);
+    // Force account selection and consent every time to ensure a fresh token
+    provider.setCustomParameters({
+      prompt: 'select_account'
+    });
 
     try {
       const result: UserCredential = await signInWithPopup(auth, provider);
