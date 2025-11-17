@@ -18,7 +18,7 @@ import { Check, ChevronsUpDown, FileText, Loader2 } from 'lucide-react';
 import { getPresentations } from '@/services/google-slides';
 import { useToast } from '@/hooks/use-toast';
 import type { Presentation } from '@/lib/data';
-import { useState } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { cn } from '@/lib/utils';
 
 export default function PresentationSelector() {
@@ -34,16 +34,19 @@ export default function PresentationSelector() {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [popoverOpen, setPopoverOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
 
-  const handleSelect = (presentation: Presentation) => {
+  const handleSelect = useCallback((presentation: Presentation) => {
+    console.log('Selected presentation:', presentation.title);
     setSelectedPresentation(presentation);
     // Reset state when a new presentation is selected
     setComments([]);
     setSummary('');
     setCurrentSlideIndex(0);
     setPopoverOpen(false);
-  };
-
+    setSearchTerm(''); // Reset search term on selection
+  }, [setSelectedPresentation, setComments, setSummary, setCurrentSlideIndex]);
+  
   const handleFetchPresentations = async () => {
     setIsLoading(true);
     try {
@@ -62,6 +65,9 @@ export default function PresentationSelector() {
         title: 'Success',
         description: `Fetched ${fetchedPresentations.length} presentations.`,
       });
+      if (fetchedPresentations.length > 0) {
+        setPopoverOpen(true);
+      }
     } catch (error) {
       console.error(error);
       toast({
@@ -74,9 +80,13 @@ export default function PresentationSelector() {
     }
   };
 
+  const filteredPresentations = useMemo(() => {
+    return presentations.filter(p => p.title.toLowerCase().includes(searchTerm.toLowerCase()));
+  }, [presentations, searchTerm]);
+
   return (
     <div className="flex items-center gap-4">
-      <Button onClick={handleFetchPresentations} disabled={isLoading}>
+      <Button id="fetch-presentations-button" onClick={handleFetchPresentations} disabled={isLoading}>
         {isLoading ? (
           <Loader2 className="animate-spin" />
         ) : (
@@ -101,14 +111,18 @@ export default function PresentationSelector() {
           </PopoverTrigger>
           <PopoverContent className="w-[300px] p-0">
             <Command>
-              <CommandInput placeholder="Search presentations..." />
+              <CommandInput 
+                placeholder="Search presentations..." 
+                value={searchTerm}
+                onValueChange={setSearchTerm}
+              />
               <CommandList>
                 <CommandEmpty>No presentations found.</CommandEmpty>
                 <CommandGroup>
-                  {presentations.map(pres => (
+                  {filteredPresentations.map(pres => (
                     <CommandItem
                       key={pres.id}
-                      value={pres.id}
+                      value={pres.title} // Use a unique value for filtering
                       onSelect={() => handleSelect(pres)}
                     >
                       <Check

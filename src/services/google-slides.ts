@@ -19,6 +19,78 @@ function extractTextFromPage(page: any): string {
     return text.replace(/\s+/g, ' ').trim();
 }
 
+export async function createSlide(
+  token: string,
+  presentationId: string,
+  title: string,
+  content: string
+): Promise<string> {
+  const url = `${SLIDES_API_URL}/${presentationId}:batchUpdate`;
+
+  // Create a unique object ID for the new slide and its elements
+  const slideId = `new_slide_${Date.now()}`;
+  const titleId = `title_${Date.now()}`;
+  const bodyId = `body_${Date.now()}`;
+
+  const requests = [
+    {
+      createSlide: {
+        objectId: slideId,
+        slideLayoutReference: {
+          predefinedLayout: 'TITLE_AND_BODY',
+        },
+        placeholderIdMappings: [
+          {
+            layoutPlaceholder: {
+              type: 'TITLE',
+            },
+            objectId: titleId,
+          },
+          {
+            layoutPlaceholder: {
+              type: 'BODY',
+            },
+            objectId: bodyId,
+          },
+        ],
+      },
+    },
+    {
+      insertText: {
+        objectId: titleId,
+        text: title,
+      },
+    },
+    {
+      insertText: {
+        objectId: bodyId,
+        text: content,
+      },
+    },
+  ];
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ requests }),
+  });
+
+  if (!response.ok) {
+    const errorBody = await response.json();
+    console.error('Failed to create slide:', errorBody);
+    throw new Error('Failed to create slide.');
+  }
+
+  const result = await response.json();
+  const newSlideObjectId = result.replies[0].createSlide.objectId;
+  console.log(`Slide created successfully with ID: ${newSlideObjectId}`);
+  return newSlideObjectId;
+}
+
+
 export async function addCommentToSlide(
   token: string,
   presentationId: string,
