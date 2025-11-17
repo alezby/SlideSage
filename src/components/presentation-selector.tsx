@@ -11,6 +11,7 @@ import { getPresentations } from '@/services/google-slides';
 import { useToast } from '@/hooks/use-toast';
 import type { Presentation } from '@/lib/data';
 import { useState } from 'react';
+import { Input } from '@/components/ui/input';
 
 export default function PresentationSelector() {
   const {
@@ -24,6 +25,7 @@ export default function PresentationSelector() {
   } = useDashboard();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const handleSelect = (presentation: Presentation) => {
     setSelectedPresentation(presentation);
@@ -62,6 +64,10 @@ export default function PresentationSelector() {
       setIsLoading(false);
     }
   };
+  
+  const filteredPresentations = presentations.filter((pres) =>
+    pres.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <div className="px-2">
@@ -75,8 +81,17 @@ export default function PresentationSelector() {
           {isLoading ? <Loader2 className="animate-spin" /> : 'Connect Google Drive'}
         </Button>
       </div>
+      {presentations.length > 0 && (
+        <div className="px-2 mb-2">
+          <Input
+            placeholder="Search presentations..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+      )}
       <SidebarMenu>
-        {presentations.map((pres) => (
+        {filteredPresentations.map((pres) => (
           <SidebarMenuItem key={pres.id}>
             <SidebarMenuButton
               onClick={() => handleSelect(pres)}
