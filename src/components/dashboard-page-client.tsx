@@ -42,6 +42,55 @@ function DashboardLayout({ children }: { children: ReactNode }) {
     }
   };
 
+  if (!selectedPresentation) {
+    return (
+      <div className="flex flex-col min-h-screen">
+        <header className="sticky top-0 z-10 flex h-14 items-center justify-between gap-4 border-b bg-background/80 px-4 backdrop-blur-sm sm:px-6">
+          <div className="flex items-center gap-2">
+            <PresentationIcon className="h-6 w-6 text-primary" />
+            <h1 className="font-headline text-xl font-semibold">Slide Sage</h1>
+          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                size="icon"
+                className="overflow-hidden rounded-full"
+              >
+                <Avatar>
+                  <AvatarImage
+                    src={user?.photoURL || "https://picsum.photos/seed/user/32/32"}
+                    alt={user?.displayName || 'user'}
+                  />
+                  <AvatarFallback>{user?.displayName?.[0] || 'U'}</AvatarFallback>
+                </Avatar>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>{user?.displayName || 'My Account'}</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>Settings</DropdownMenuItem>
+              <DropdownMenuItem>Support</DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleSignOut}>
+                Logout
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </header>
+        <main className="flex flex-1 items-center justify-center">
+            <div className="flex flex-col items-center gap-4 text-center">
+                <h2 className="text-2xl font-semibold">Welcome to Slide Sage</h2>
+                <p className="text-muted-foreground">
+                Connect your Google Drive to get started.
+                </p>
+                <PresentationSelector />
+            </div>
+        </main>
+      </div>
+    );
+  }
+
   return (
     <SidebarProvider defaultOpen={true}>
       <div className="min-h-screen">
@@ -92,18 +141,7 @@ function DashboardLayout({ children }: { children: ReactNode }) {
             </DropdownMenu>
           </header>
           <main className="flex-1 p-4 sm:px-6">
-            {selectedPresentation ? (
-              children
-            ) : (
-              <div className="flex pt-24 justify-center rounded-lg text-center">
-                <div className="flex flex-col items-center gap-4">
-                  <h2 className="text-2xl font-semibold">Welcome to Slide Sage</h2>
-                  <p className="text-muted-foreground">
-                    Connect your Google Drive to get started.
-                  </p>
-                </div>
-              </div>
-            )}
+            {children}
           </main>
         </SidebarInset>
       </div>
