@@ -37,6 +37,7 @@ function DashboardLayout({ children }: { children: ReactNode }) {
   const handleSignOut = async () => {
     if (auth) {
       await auth.signOut();
+      sessionStorage.removeItem('google_access_token');
       router.push('/');
     }
   };
@@ -96,7 +97,12 @@ function DashboardLayout({ children }: { children: ReactNode }) {
               children
             ) : (
               <div className="flex h-[80vh] items-center justify-center rounded-lg border border-dashed text-center">
-                Select a presentation to begin.
+                <div className="flex flex-col items-center gap-4">
+                  <h2 className="text-2xl font-semibold">Welcome to Slide Sage</h2>
+                  <p className="text-muted-foreground">
+                    Connect your Google Drive to get started.
+                  </p>
+                </div>
               </div>
             )}
           </main>

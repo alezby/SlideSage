@@ -16,6 +16,7 @@ export type ChatMessage = {
 
 type DashboardContextType = {
   presentations: Presentation[];
+  setPresentations: Dispatch<SetStateAction<Presentation[]>>;
   selectedPresentation: Presentation | null;
   setSelectedPresentation: Dispatch<SetStateAction<Presentation | null>>;
   currentSlideIndex: number;
@@ -45,8 +46,9 @@ export function DashboardProvider({
   children: ReactNode;
   presentations: Presentation[];
 }) {
+  const [presentations, setPresentations] = useState<Presentation[]>(initialPresentations);
   const [selectedPresentation, setSelectedPresentation] =
-    useState<Presentation | null>(initialPresentations[0] || null);
+    useState<Presentation | null>(null);
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const [comments, setComments] = useState<Comment[]>([]);
   const [analysisPrompt, setAnalysisPrompt] = useState(
@@ -59,7 +61,8 @@ export function DashboardProvider({
   const [isChatting, setIsChatting] = useState(false);
 
   const value = {
-    presentations: initialPresentations,
+    presentations,
+    setPresentations,
     selectedPresentation,
     setSelectedPresentation,
     currentSlideIndex,

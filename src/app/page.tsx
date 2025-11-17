@@ -1,5 +1,4 @@
 'use client';
-import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -8,12 +7,18 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Presentation } from 'lucide-react';
 import { useUser } from '@/firebase';
+import {
+  GoogleAuthProvider,
+  signInWithPopup,
+  type UserCredential,
+} from 'firebase/auth';
+import { Presentation } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 
+const SLIDES_SCOPE = 'https://www.googleapis.com/auth/presentations.readonly';
+const DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.readonly';
 
 export default function Home() {
   const { user, auth } = useUser();
@@ -35,9 +40,17 @@ export default function Home() {
   const handleGoogleSignIn = async () => {
     if (auth) {
       const provider = new GoogleAuthProvider();
+      provider.addScope(SLIDES_SCOPE);
+      provider.addScope(DRIVE_SCOPE);
       try {
-        await signInWithPopup(auth, provider);
-        // The useEffect hook will handle the redirect
+        const result: UserCredential = await signInWithPopup(auth, provider);
+        const credential = GoogleAuthProvider.credentialFromResult(result);
+        if (credential) {
+          const accessToken = credential.accessToken;
+          // You can store the access token in a secure way, like session storage or a context
+          // For this example, we'll store it in session storage
+          sessionStorage.setItem('google_access_token', accessToken || '');
+        }
       } catch (error) {
         console.error('Error signing in with Google', error);
       }
@@ -47,7 +60,7 @@ export default function Home() {
   if (user) {
     return null; // Don't render anything while redirecting
   }
-  
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md shadow-lg">
@@ -64,8 +77,8 @@ export default function Home() {
         </CardHeader>
         <CardContent className="flex flex-col items-center gap-4">
           <p className="text-center text-sm">
-            Connect your Google account to start analyzing your presentations for
-            brand consistency, clarity, and impact.
+            Connect your Google account to start analyzing your presentations
+            for brand consistency, clarity, and impact.
           </p>
           <Button onClick={handleGoogleSignIn} className="w-full" size="lg">
             Connect with Google
