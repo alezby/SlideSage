@@ -9,7 +9,6 @@ import {
   CarouselPrevious,
   type CarouselApi,
 } from '@/components/ui/carousel';
-import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import AnalysisPanel from './analysis-panel';
 
@@ -60,21 +59,12 @@ export default function SlideViewer() {
                         {slideComments.length}
                       </div>
                     )}
-                    <CardContent className="p-0 aspect-video relative">
-                      <Image
-                        src={selectedPresentation.thumbnailUrl || slide.image.imageUrl}
-                        alt={slide.image.description}
-                        fill
-                        sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
-                        className="object-cover"
-                        data-ai-hint={slide.image.imageHint}
-                        priority={index === 0}
-                      />
-                      <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/70 via-black/20 to-transparent p-8 text-white">
-                        <h2 className="font-headline text-4xl font-bold drop-shadow-lg">
+                    <CardContent className="p-0 aspect-video relative flex flex-col justify-center items-center bg-card">
+                       <div className="p-8 text-center">
+                        <h2 className="font-headline text-4xl font-bold">
                           {slide.title}
                         </h2>
-                        <p className="max-w-3xl text-xl drop-shadow-md">
+                        <p className="max-w-3xl text-xl mt-4 text-muted-foreground">
                           {slide.content}
                         </p>
                       </div>
