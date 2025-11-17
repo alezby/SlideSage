@@ -19,7 +19,12 @@ export type Slide = {
   id: string;
   title: string;
   content: string;
-  image: ImagePlaceholder;
+  image: {
+    id: string;
+    imageUrl: string;
+    description: string;
+    imageHint: string;
+  };
 };
 
 export type Presentation = {
