@@ -13,7 +13,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 export default function Home() {
-  const { user, signInWithGoogle } = useUser();
+  const { user, signInWithGoogle, loading } = useUser();
   const router = useRouter();
   const [hostname, setHostname] = useState('');
 
@@ -29,16 +29,8 @@ export default function Home() {
     }
   }, []);
 
-  const handleGoogleSignIn = async () => {
-    try {
-      await signInWithGoogle();
-    } catch (error) {
-      console.error('Error signing in with Google', error);
-    }
-  };
-
-  if (user) {
-    return null; // Don't render anything while redirecting
+  if (loading || user) {
+    return null; // Don't render anything while checking auth or redirecting
   }
 
   return (
@@ -60,7 +52,7 @@ export default function Home() {
             Connect your Google account to start analyzing your presentations
             for brand consistency, clarity, and impact.
           </p>
-          <Button onClick={handleGoogleSignIn} className="w-full" size="lg">
+          <Button onClick={signInWithGoogle} className="w-full" size="lg">
             Connect with Google
           </Button>
           {hostname && (
