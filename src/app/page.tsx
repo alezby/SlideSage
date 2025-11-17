@@ -16,6 +16,7 @@ import { useToast } from '@/hooks/use-toast';
 export default function Home() {
   const { user, signInWithGoogle, loading } = useUser();
   const router = useRouter();
+  const { toast } = useToast();
   const [hostname, setHostname] = useState('');
   const [isSigningIn, setIsSigningIn] = useState(false);
 
