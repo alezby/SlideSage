@@ -86,7 +86,9 @@ const createSlideTool = ai.defineTool(
     name: 'createSlide',
     description: 'Creates a new slide with a title and content in the presentation.',
     inputSchema: SlideSchema,
-    outputSchema: z.string(),
+    outputSchema: z.object({
+      slideId: z.string().describe('The object ID of the newly created slide.'),
+    }),
   },
   async({ title, content }, context) => {
      if (!context || !context.auth) {
@@ -94,15 +96,15 @@ const createSlideTool = ai.defineTool(
     }
     const { presentationId, accessToken } = context.auth as ConversationalAgentInput;
      if (!presentationId || !accessToken) {
-      return 'Error: Missing presentation or authentication details.';
+      throw new Error('Error: Missing presentation or authentication details.');
     }
 
     try {
       const newSlideId = await createSlideService(accessToken, presentationId, title, content);
-      return `Successfully created a new slide with ID ${newSlideId}.`;
+      return { slideId: newSlideId };
     } catch (e: any) {
       console.error("Tool execution failed for createSlide:", e);
-      return `Failed to create slide. Error: ${e.message}`;
+      throw new Error(`Failed to create slide. Error: ${e.message}`);
     }
   }
 );
@@ -161,11 +163,9 @@ const conversationalAgentFlow = ai.defineFlow(
 
         // Handle createSlide tool
         if (toolRequest.name === 'createSlide') {
-          const { title, content } = toolRequest.input;
-          const result = await toolRequest.run() as string; // result is the success message with the ID
-          const slideIdMatch = result.match(/ID (\S+)/);
-          if (slideIdMatch) {
-            slideAdded = { slideId: slideIdMatch[1] };
+          const result = await toolRequest.run() as { slideId: string };
+          if (result && result.slideId) {
+             slideAdded = { slideId: result.slideId };
           }
         }
       }

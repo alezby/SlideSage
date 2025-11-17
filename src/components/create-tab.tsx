@@ -4,16 +4,19 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { conversationalAgent } from '@/ai/flows/conversational-agent';
 import { useToast } from '@/hooks/use-toast';
-import { Send, Loader2, User, Bot, RefreshCw } from 'lucide-react';
+import { Send, Loader2, User, Bot } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
+import { getPresentations } from '@/services/google-slides';
 
 export default function CreateTab() {
   const {
     selectedPresentation,
     setPresentations,
+    setSelectedPresentation,
+    setCurrentSlideIndex,
   } = useDashboard();
   const { toast } = useToast();
   const [userInput, setUserInput] = useState('');
@@ -29,6 +32,32 @@ export default function CreateTab() {
       });
     }
   }, [chatHistory, isChatting]);
+
+  const refreshPresentation = async (presentationId: string, newSlideId: string) => {
+    const token = sessionStorage.getItem('google_access_token');
+    if (!token) return;
+    try {
+      // Refetch all presentations to get the updated one
+      const allPresentations = await getPresentations(token);
+      setPresentations(allPresentations);
+
+      const updatedPresentation = allPresentations.find(p => p.id === presentationId);
+      if (updatedPresentation) {
+        setSelectedPresentation(updatedPresentation);
+        // Find the index of the new slide and go to it
+        const newSlideIndex = updatedPresentation.slides.findIndex(s => s.id === newSlideId);
+        if (newSlideIndex !== -1) {
+          setCurrentSlideIndex(newSlideIndex);
+        }
+      }
+    } catch (error) {
+       toast({
+        title: 'Refresh Failed',
+        description: 'Could not refresh the presentation after creating a slide.',
+        variant: 'destructive',
+      });
+    }
+  };
 
 
   const handleChat = async (e: React.FormEvent) => {
@@ -63,15 +92,13 @@ export default function CreateTab() {
       const agentResponse: ChatMessage = { role: 'assistant', content: result.response };
       setChatHistory([...newHistory, agentResponse]);
 
-      // If the agent added a slide, show a toast and refresh presentations
-      if (result.slideAdded) {
+      // If the agent added a slide, show a toast and refresh presentation
+      if (result.slideAdded && result.slideAdded.slideId) {
         toast({
           title: 'Slide Created',
-          description: 'A new slide has been added to your presentation. Refreshing presentation list...',
+          description: 'A new slide has been added to your presentation. Refreshing...',
         });
-        // This is a simple way to refresh. A more advanced implementation
-        // might update the presentation object in-place.
-        document.getElementById('fetch-presentations-button')?.click();
+        await refreshPresentation(selectedPresentation.id, result.slideAdded.slideId);
       }
 
     } catch (error) {
