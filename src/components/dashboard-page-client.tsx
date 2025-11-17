@@ -92,60 +92,58 @@ function DashboardLayout({ children }: { children: ReactNode }) {
   }
 
   return (
-    <SidebarProvider defaultOpen={true}>
-      <div className="min-h-screen">
-        <Sidebar>
-          <SidebarHeader>
-            <div className="flex items-center gap-2">
-              <Button variant="ghost" size="icon" asChild>
-                <Link href="/dashboard">
-                  <PresentationIcon className="h-6 w-6 text-primary" />
-                </Link>
+    <div className="min-h-screen">
+      <Sidebar>
+        <SidebarHeader>
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="icon" asChild>
+              <Link href="/dashboard">
+                <PresentationIcon className="h-6 w-6 text-primary" />
+              </Link>
+            </Button>
+            <h1 className="font-headline text-xl font-semibold">Slide Sage</h1>
+          </div>
+        </SidebarHeader>
+        <SidebarContent>
+          <PresentationSelector />
+        </SidebarContent>
+      </Sidebar>
+      <SidebarInset>
+        <header className="sticky top-0 z-10 flex h-14 items-center justify-end gap-4 border-b bg-background/80 px-4 backdrop-blur-sm sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6 sm:py-4">
+          <SidebarTrigger className="md:hidden absolute left-4 top-3" />
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                size="icon"
+                className="overflow-hidden rounded-full"
+              >
+                <Avatar>
+                  <AvatarImage
+                    src={user?.photoURL || "https://picsum.photos/seed/user/32/32"}
+                    alt={user?.displayName || 'user'}
+                  />
+                  <AvatarFallback>{user?.displayName?.[0] || 'U'}</AvatarFallback>
+                </Avatar>
               </Button>
-              <h1 className="font-headline text-xl font-semibold">Slide Sage</h1>
-            </div>
-          </SidebarHeader>
-          <SidebarContent>
-            <PresentationSelector />
-          </SidebarContent>
-        </Sidebar>
-        <SidebarInset>
-          <header className="sticky top-0 z-10 flex h-14 items-center justify-end gap-4 border-b bg-background/80 px-4 backdrop-blur-sm sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6 sm:py-4">
-            <SidebarTrigger className="md:hidden absolute left-4 top-3" />
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="overflow-hidden rounded-full"
-                >
-                  <Avatar>
-                    <AvatarImage
-                      src={user?.photoURL || "https://picsum.photos/seed/user/32/32"}
-                      alt={user?.displayName || 'user'}
-                    />
-                    <AvatarFallback>{user?.displayName?.[0] || 'U'}</AvatarFallback>
-                  </Avatar>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuLabel>{user?.displayName || 'My Account'}</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>Settings</DropdownMenuItem>
-                <DropdownMenuItem>Support</DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleSignOut}>
-                  Logout
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </header>
-          <main className="flex-1 p-4 sm:px-6">
-            {children}
-          </main>
-        </SidebarInset>
-      </div>
-    </SidebarProvider>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>{user?.displayName || 'My Account'}</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>Settings</DropdownMenuItem>
+              <DropdownMenuItem>Support</DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleSignOut}>
+                Logout
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </header>
+        <main className="flex-1 p-4 sm:px-6">
+          {children}
+        </main>
+      </SidebarInset>
+    </div>
   );
 }
 
@@ -173,16 +171,18 @@ export default function DashboardPageClient({
   
   return (
     <DashboardProvider presentations={presentations}>
-      <DashboardLayout>
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 h-full">
-          <div className="lg:col-span-3 xl:col-span-4">
-            <SlideViewer />
+      <SidebarProvider defaultOpen={true}>
+        <DashboardLayout>
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 h-full">
+            <div className="lg:col-span-3 xl:col-span-4">
+              <SlideViewer />
+            </div>
+            <div className="lg:col-span-2 xl:col-span-1">
+              <AnalysisPanel />
+            </div>
           </div>
-          <div className="lg:col-span-2 xl:col-span-1">
-            <AnalysisPanel />
-          </div>
-        </div>
-      </DashboardLayout>
+        </DashboardLayout>
+      </SidebarProvider>
     </DashboardProvider>
   );
 }
