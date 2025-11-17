@@ -108,8 +108,8 @@ export default function PresentationSelector() {
                   {presentations.map(pres => (
                     <CommandItem
                       key={pres.id}
-                      onSelect={() => handleSelect(pres)}
                       value={pres.title}
+                      onSelect={() => handleSelect(pres)}
                     >
                       <Check
                         className={cn(
