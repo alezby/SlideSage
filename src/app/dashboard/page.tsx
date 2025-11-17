@@ -1,3 +1,4 @@
+'use client';
 import DashboardPageClient from '@/components/dashboard-page-client';
 import { presentations } from '@/lib/data';
 
