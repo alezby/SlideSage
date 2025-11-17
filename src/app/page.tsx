@@ -8,20 +8,12 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { useUser } from '@/firebase';
-import {
-  GoogleAuthProvider,
-  signInWithPopup,
-  type UserCredential,
-} from 'firebase/auth';
 import { Presentation } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-const SLIDES_SCOPE = 'https://www.googleapis.com/auth/presentations.readonly';
-const DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.readonly';
-
 export default function Home() {
-  const { user, auth } = useUser();
+  const { user, signInWithGoogle } = useUser();
   const router = useRouter();
   const [hostname, setHostname] = useState('');
 
@@ -38,22 +30,10 @@ export default function Home() {
   }, []);
 
   const handleGoogleSignIn = async () => {
-    if (auth) {
-      const provider = new GoogleAuthProvider();
-      provider.addScope(SLIDES_SCOPE);
-      provider.addScope(DRIVE_SCOPE);
-      try {
-        const result: UserCredential = await signInWithPopup(auth, provider);
-        const credential = GoogleAuthProvider.credentialFromResult(result);
-        if (credential) {
-          const accessToken = credential.accessToken;
-          // You can store the access token in a secure way, like session storage or a context
-          // For this example, we'll store it in session storage
-          sessionStorage.setItem('google_access_token', accessToken || '');
-        }
-      } catch (error) {
-        console.error('Error signing in with Google', error);
-      }
+    try {
+      await signInWithGoogle();
+    } catch (error) {
+      console.error('Error signing in with Google', error);
     }
   };
 
