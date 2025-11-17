@@ -1,17 +1,14 @@
 'use client';
 import { useDashboard } from '@/contexts/dashboard-context';
-import {
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-} from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
-import { FileText, Loader2 } from 'lucide-react';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Check, ChevronsUpDown, FileText, Loader2 } from 'lucide-react';
 import { getPresentations } from '@/services/google-slides';
 import { useToast } from '@/hooks/use-toast';
 import type { Presentation } from '@/lib/data';
 import { useState } from 'react';
-import { Input } from '@/components/ui/input';
+import { cn } from '@/lib/utils';
 
 export default function PresentationSelector() {
   const {
@@ -25,7 +22,7 @@ export default function PresentationSelector() {
   } = useDashboard();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [popoverOpen, setPopoverOpen] = useState(false);
 
   const handleSelect = (presentation: Presentation) => {
     setSelectedPresentation(presentation);
@@ -33,6 +30,7 @@ export default function PresentationSelector() {
     setComments([]);
     setSummary('');
     setCurrentSlideIndex(0);
+    setPopoverOpen(false);
   };
 
   const handleFetchPresentations = async () => {
@@ -64,45 +62,57 @@ export default function PresentationSelector() {
       setIsLoading(false);
     }
   };
-  
-  const filteredPresentations = presentations.filter((pres) =>
-    pres.title.toLowerCase().includes(searchQuery.toLowerCase())
-  );
 
   return (
-    <div className="px-2">
-      <div className="flex items-center justify-between px-2 mb-2">
-        <h2 className="text-lg font-semibold tracking-tight">
-          Presentations
-        </h2>
-      </div>
-      <div className="px-2 mb-2">
-        <Button onClick={handleFetchPresentations} disabled={isLoading} className="w-full">
+    <div className="flex items-center gap-4">
+       <Button onClick={handleFetchPresentations} disabled={isLoading}>
           {isLoading ? <Loader2 className="animate-spin" /> : 'Connect Google Drive'}
         </Button>
-      </div>
+      
       {presentations.length > 0 && (
-        <div className="px-2 mb-2">
-          <Input
-            placeholder="Search presentations..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
-      )}
-      <SidebarMenu>
-        {filteredPresentations.map((pres) => (
-          <SidebarMenuItem key={pres.id}>
-            <SidebarMenuButton
-              onClick={() => handleSelect(pres)}
-              isActive={selectedPresentation?.id === pres.id}
+         <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              role="combobox"
+              aria-expanded={popoverOpen}
+              className="w-[250px] justify-between"
+              disabled={presentations.length === 0}
             >
-              <FileText />
-              <span>{pres.title}</span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        ))}
-      </SidebarMenu>
+              {selectedPresentation
+                ? selectedPresentation.title
+                : "Select a presentation..."}
+              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-[300px] p-0">
+            <Command>
+              <CommandInput placeholder="Search presentations..." />
+              <CommandList>
+                <CommandEmpty>No presentations found.</CommandEmpty>
+                <CommandGroup>
+                  {presentations.map((pres) => (
+                    <CommandItem
+                      key={pres.id}
+                      onSelect={() => handleSelect(pres)}
+                      value={pres.title}
+                    >
+                      <Check
+                        className={cn(
+                          "mr-2 h-4 w-4",
+                          selectedPresentation?.id === pres.id ? "opacity-100" : "opacity-0"
+                        )}
+                      />
+                       <FileText className="mr-2 h-4 w-4" />
+                      <span className="truncate">{pres.title}</span>
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </CommandList>
+            </Command>
+          </PopoverContent>
+        </Popover>
+      )}
     </div>
   );
 }
