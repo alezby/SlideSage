@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
-export default function AnalysisTab() {
+export default function AnalysisTab({ onAnalysisComplete }: { onAnalysisComplete: () => void }) {
   const {
     selectedPresentation,
     analysisPrompt,
@@ -52,6 +52,7 @@ export default function AnalysisTab() {
           description: `${result.comments.length} suggestions found.`,
         });
         setCurrentSlideIndex(result.comments[0].slideNumber - 1);
+        onAnalysisComplete(); // Switch to the chat tab
       } else {
         toast({
           title: 'Analysis Complete',
