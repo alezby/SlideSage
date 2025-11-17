@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from 'next/link';
@@ -26,7 +25,6 @@ import { useDashboard } from '@/contexts/dashboard-context';
 export default function DashboardHeader() {
   const { user, auth } = useUser();
   const router = useRouter();
-  const { presentations } = useDashboard();
 
   const handleSignOut = async () => {
     if (auth) {
@@ -39,20 +37,20 @@ export default function DashboardHeader() {
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
       <div className="flex items-center gap-2">
-         <Link href="/dashboard" className="flex items-center gap-2 font-semibold">
-            <PresentationIcon className="h-6 w-6 text-primary" />
-            <span className="">Slide Sage</span>
-          </Link>
+        <Link
+          href="/dashboard"
+          className="flex items-center gap-2 font-semibold"
+        >
+          <PresentationIcon className="h-6 w-6 text-primary" />
+          <span className="">Slide Sage</span>
+        </Link>
       </div>
-     
-      <div className="flex-1">
-        <nav className="flex items-center justify-center">
-            {presentations.length > 0 && <PresentationSelector />}
-        </nav>
+
+      <div className="flex-1 flex justify-center">
+         <PresentationSelector />
       </div>
 
       <div className="flex items-center gap-4">
-        {presentations.length === 0 && <PresentationSelector />}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
@@ -65,12 +63,16 @@ export default function DashboardHeader() {
                   src={user?.photoURL || 'https://picsum.photos/seed/user/32/32'}
                   alt={user?.displayName || 'user'}
                 />
-                <AvatarFallback>{user?.displayName?.[0] || 'U'}</AvatarFallback>
+                <AvatarFallback>
+                  {user?.displayName?.[0] || 'U'}
+                </AvatarFallback>
               </Avatar>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuLabel>{user?.displayName || 'My Account'}</DropdownMenuLabel>
+            <DropdownMenuLabel>
+              {user?.displayName || 'My Account'}
+            </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
               <Settings className="mr-2 h-4 w-4" />

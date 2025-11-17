@@ -1,8 +1,19 @@
 'use client';
 import { useDashboard } from '@/contexts/dashboard-context';
 import { Button } from '@/components/ui/button';
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 import { Check, ChevronsUpDown, FileText, Loader2 } from 'lucide-react';
 import { getPresentations } from '@/services/google-slides';
 import { useToast } from '@/hooks/use-toast';
@@ -65,23 +76,26 @@ export default function PresentationSelector() {
 
   return (
     <div className="flex items-center gap-4">
-       <Button onClick={handleFetchPresentations} disabled={isLoading}>
-          {isLoading ? <Loader2 className="animate-spin" /> : 'Connect Google Drive'}
-        </Button>
-      
+      <Button onClick={handleFetchPresentations} disabled={isLoading}>
+        {isLoading ? (
+          <Loader2 className="animate-spin" />
+        ) : (
+          'Connect Google Drive'
+        )}
+      </Button>
+
       {presentations.length > 0 && (
-         <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+        <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
           <PopoverTrigger asChild>
             <Button
               variant="outline"
               role="combobox"
               aria-expanded={popoverOpen}
               className="w-[250px] justify-between"
-              disabled={presentations.length === 0}
             >
               {selectedPresentation
                 ? selectedPresentation.title
-                : "Select a presentation..."}
+                : 'Select a presentation...'}
               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
             </Button>
           </PopoverTrigger>
@@ -91,7 +105,7 @@ export default function PresentationSelector() {
               <CommandList>
                 <CommandEmpty>No presentations found.</CommandEmpty>
                 <CommandGroup>
-                  {presentations.map((pres) => (
+                  {presentations.map(pres => (
                     <CommandItem
                       key={pres.id}
                       onSelect={() => handleSelect(pres)}
@@ -99,11 +113,13 @@ export default function PresentationSelector() {
                     >
                       <Check
                         className={cn(
-                          "mr-2 h-4 w-4",
-                          selectedPresentation?.id === pres.id ? "opacity-100" : "opacity-0"
+                          'mr-2 h-4 w-4',
+                          selectedPresentation?.id === pres.id
+                            ? 'opacity-100'
+                            : 'opacity-0'
                         )}
                       />
-                       <FileText className="mr-2 h-4 w-4" />
+                      <FileText className="mr-2 h-4 w-4" />
                       <span className="truncate">{pres.title}</span>
                     </CommandItem>
                   ))}
