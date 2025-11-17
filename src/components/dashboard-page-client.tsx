@@ -1,0 +1,115 @@
+'use client';
+import { DashboardProvider, useDashboard } from '@/contexts/dashboard-context';
+import type { Presentation } from '@/lib/data';
+import type { ReactNode } from 'react';
+import Link from 'next/link';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Presentation as PresentationIcon } from 'lucide-react';
+import {
+  SidebarProvider,
+  Sidebar,
+  SidebarHeader,
+  SidebarTrigger,
+  SidebarInset,
+  SidebarContent,
+} from '@/components/ui/sidebar';
+import PresentationSelector from './presentation-selector';
+import SlideViewer from './slide-viewer';
+import AnalysisPanel from './analysis-panel';
+
+function DashboardLayout({ children }: { children: ReactNode }) {
+  const { selectedPresentation } = useDashboard();
+  return (
+    <SidebarProvider defaultOpen={true}>
+      <div className="min-h-screen">
+        <Sidebar>
+          <SidebarHeader>
+            <div className="flex items-center gap-2">
+              <Button variant="ghost" size="icon" asChild>
+                <Link href="/dashboard">
+                  <PresentationIcon className="h-6 w-6 text-primary" />
+                </Link>
+              </Button>
+              <h1 className="font-headline text-xl font-semibold">Slide Sage</h1>
+            </div>
+          </SidebarHeader>
+          <SidebarContent>
+            <PresentationSelector />
+          </SidebarContent>
+        </Sidebar>
+        <SidebarInset>
+          <header className="sticky top-0 z-10 flex h-14 items-center gap-4 border-b bg-background/80 px-4 backdrop-blur-sm sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6 sm:py-4">
+            <SidebarTrigger className="md:hidden" />
+            <div className="relative ml-auto flex-1 md:grow-0"></div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="overflow-hidden rounded-full"
+                >
+                  <Avatar>
+                    <AvatarImage
+                      src="https://picsum.photos/seed/user/32/32"
+                      alt="@user"
+                    />
+                    <AvatarFallback>U</AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>Settings</DropdownMenuItem>
+                <DropdownMenuItem>Support</DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link href="/">Logout</Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </header>
+          <main className="flex-1 p-4 sm:px-6">
+            {selectedPresentation ? (
+              children
+            ) : (
+              <div className="flex h-[80vh] items-center justify-center rounded-lg border border-dashed text-center">
+                Select a presentation to begin.
+              </div>
+            )}
+          </main>
+        </SidebarInset>
+      </div>
+    </SidebarProvider>
+  );
+}
+
+export default function DashboardPageClient({
+  presentations,
+}: {
+  presentations: Presentation[];
+}) {
+  return (
+    <DashboardProvider presentations={presentations}>
+      <DashboardLayout>
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 h-full">
+          <div className="lg:col-span-3 xl:col-span-4">
+            <SlideViewer />
+          </div>
+          <div className="lg:col-span-2 xl:col-span-1">
+            <AnalysisPanel />
+          </div>
+        </div>
+      </DashboardLayout>
+    </DashboardProvider>
+  );
+}

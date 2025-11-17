@@ -1,3 +1,64 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "slide1",
+      "description": "Title slide for a marketing proposal",
+      "imageUrl": "https://images.unsplash.com/photo-1573167507387-6b4b98cb7c13?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxidXNpbmVzcyUyMHByZXNlbnRhdGlvbnxlbnwwfHx8fDE3NjMyNzYwMjR8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "business presentation"
+    },
+    {
+      "id": "slide2",
+      "description": "Graph showing market growth",
+      "imageUrl": "https://images.unsplash.com/photo-1762279389002-7b6abd7bd6c6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxjaGFydCUyMGRhdGF8ZW58MHx8fHwxNzYzMzIxOTIxfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "chart data"
+    },
+    {
+      "id": "slide3",
+      "description": "Team introduction slide",
+      "imageUrl": "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHx0ZWFtJTIwb2ZmaWNlfGVufDB8fHx8MTc2MzMyNjk1OHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "team office"
+    },
+    {
+      "id": "slide4",
+      "description": "Product feature overview",
+      "imageUrl": "https://images.unsplash.com/photo-1750056393356-d1de9d222a29?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxwcm9kdWN0JTIwaW50ZXJmYWNlfGVufDB8fHx8MTc2MzM4MTcwN3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "product interface"
+    },
+    {
+      "id": "slide5",
+      "description": "Contact information slide",
+      "imageUrl": "https://images.unsplash.com/photo-1534536281715-e28d76689b4d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxjb250YWN0JTIwdXN8ZW58MHx8fHwxNzYzMzMwNzE0fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "contact us"
+    },
+    {
+      "id": "slide6",
+      "description": "Q1 financial report title slide",
+      "imageUrl": "https://images.unsplash.com/photo-1618044733300-9472054094ee?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxmaW5hbmNlJTIwcmVwb3J0fGVufDB8fHx8MTc2MzM2Mzg5NXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "finance report"
+    },
+    {
+      "id": "slide7",
+      "description": "Pie chart of budget allocation",
+      "imageUrl": "https://images.unsplash.com/photo-1542744173-05336fcc7ad4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxwaWUlMjBjaGFydHxlbnwwfHx8fDE3NjMzMDk2MTh8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "pie chart"
+    },
+    {
+      "id": "slide8",
+      "description": "Project timeline gantt chart",
+      "imageUrl": "https://images.unsplash.com/photo-1695218716405-5b813000e994?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxnYW50dCUyMGNoYXJ0fGVufDB8fHx8MTc2MzM1NTM3N3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "gantt chart"
+    },
+    {
+      "id": "slide9",
+      "description": "New office location map",
+      "imageUrl": "https://images.unsplash.com/photo-1717700299581-c2fc3fad4ee8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxjaXR5JTIwbWFwfGVufDB8fHx8MTc2MzMwNDE5MXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "city map"
+    },
+    {
+      "id": "slide10",
+      "description": "Thank you slide",
+      "imageUrl": "https://images.unsplash.com/photo-1602045486350-4e53a69865c6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHx0aGFuayUyMHlvdXxlbnwwfHx8fDE3NjMzNjM1NjF8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "thank you"
+    }
+  ]
 }
