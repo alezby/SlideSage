@@ -1,41 +1,8 @@
-
 import type { Presentation, Slide } from '@/lib/data';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 const SLIDES_API_URL = 'https://slides.googleapis.com/v1/presentations';
 const DRIVE_API_URL = 'https://www.googleapis.com/drive/v3/files';
-
-// A simple cache to avoid re-fetching the same image
-const imageCache = new Map<string, string>();
-
-async function getSlideImageUrl(presentationId: string, pageObjectId: string, token: string): Promise<string> {
-  const cacheKey = `${presentationId}-${pageObjectId}`;
-  if (imageCache.has(cacheKey)) {
-    return imageCache.get(cacheKey)!;
-  }
-
-  try {
-    const response = await fetch(
-      `${SLIDES_API_URL}/${presentationId}/pages/${pageObjectId}/thumbnail`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    if (!response.ok) {
-      // Fallback to a placeholder if thumbnail fails
-      return PlaceHolderImages[0].imageUrl;
-    }
-    const thumbnailData = await response.json();
-    const imageUrl = thumbnailData.contentUrl;
-    imageCache.set(cacheKey, imageUrl);
-    return imageUrl;
-  } catch (error) {
-    console.error('Failed to fetch slide thumbnail:', error);
-    return PlaceHolderImages[0].imageUrl; // Fallback image
-  }
-}
 
 function extractTextFromPage(page: any): string {
     let text = '';
@@ -77,15 +44,25 @@ export async function getPresentations(token: string): Promise<Presentation[]> {
           Authorization: `Bearer ${token}`,
         },
       });
+
+      if (!presResponse.ok) {
+        console.error(`Failed to fetch presentation details for ${file.name}`);
+        // Return a presentation object with an empty slides array or handle as needed
+        return {
+          id: file.id,
+          title: file.name,
+          thumbnailUrl: file.thumbnailLink,
+          slides: [],
+        };
+      }
+      
       const presData = await presResponse.json();
 
       const slides: Slide[] = await Promise.all(
-        presData.slides.map(async (slideData: any, index: number): Promise<Slide> => {
+        (presData.slides || []).map(async (slideData: any, index: number): Promise<Slide> => {
           const pageObjectId = slideData.objectId;
-          const imageUrl = await getSlideImageUrl(file.id, pageObjectId, token);
           const content = extractTextFromPage(slideData);
           const title = content.split('\n')[0] || `Slide ${index + 1}`;
-
 
           return {
             id: pageObjectId,
@@ -93,7 +70,7 @@ export async function getPresentations(token: string): Promise<Presentation[]> {
             content: content.substring(title.length).trim(),
             image: {
               id: pageObjectId,
-              imageUrl: imageUrl,
+              imageUrl: file.thumbnailLink,
               description: title,
               imageHint: 'presentation slide',
             },
@@ -104,10 +81,11 @@ export async function getPresentations(token: string): Promise<Presentation[]> {
       return {
         id: file.id,
         title: file.name,
+        thumbnailUrl: file.thumbnailLink,
         slides,
       };
     })
   );
 
-  return presentations;
+  return presentations.filter(p => p.slides.length > 0);
 }

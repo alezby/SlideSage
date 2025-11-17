@@ -59,7 +59,7 @@ export default function SlideViewer() {
                 )}
                 <CardContent className="p-0 aspect-video relative">
                   <Image
-                    src={slide.image.imageUrl}
+                    src={selectedPresentation.thumbnailUrl || slide.image.imageUrl}
                     alt={slide.image.description}
                     fill
                     sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"

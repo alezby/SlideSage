@@ -26,6 +26,7 @@ export type Presentation = {
   id: string;
   title: string;
   slides: Slide[];
+  thumbnailUrl?: string;
 };
 
 export const presentations: Presentation[] = [
