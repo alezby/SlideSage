@@ -61,9 +61,8 @@ function DashboardLayout({ children }: { children: ReactNode }) {
           </SidebarContent>
         </Sidebar>
         <SidebarInset>
-          <header className="sticky top-0 z-10 flex h-14 items-center justify-between gap-4 border-b bg-background/80 px-4 backdrop-blur-sm sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6 sm:py-4">
-            <SidebarTrigger className="md:hidden" />
-            <div className="flex-1"></div>
+          <header className="sticky top-0 z-10 flex h-14 items-center justify-end gap-4 border-b bg-background/80 px-4 backdrop-blur-sm sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6 sm:py-4">
+            <SidebarTrigger className="md:hidden absolute left-4 top-3" />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
