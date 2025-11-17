@@ -10,6 +10,7 @@ import { FileText, Loader2 } from 'lucide-react';
 import { getPresentations } from '@/services/google-slides';
 import { useToast } from '@/hooks/use-toast';
 import type { Presentation } from '@/lib/data';
+import { useState } from 'react';
 
 export default function PresentationSelector() {
   const {
