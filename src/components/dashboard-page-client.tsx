@@ -25,9 +25,28 @@ import {
 import PresentationSelector from './presentation-selector';
 import SlideViewer from './slide-viewer';
 import AnalysisPanel from './analysis-panel';
+import { useUser } from '@/firebase';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
 function DashboardLayout({ children }: { children: ReactNode }) {
   const { selectedPresentation } = useDashboard();
+  const { user, auth } = useUser();
+  const router = useRouter();
+
+  const handleSignOut = async () => {
+    if (auth) {
+      await auth.signOut();
+      router.push('/');
+    }
+  };
+
+  useEffect(() => {
+    if (auth && !user) {
+      router.push('/');
+    }
+  }, [user, auth, router]);
+
   return (
     <SidebarProvider defaultOpen={true}>
       <div className="min-h-screen">
@@ -59,21 +78,21 @@ function DashboardLayout({ children }: { children: ReactNode }) {
                 >
                   <Avatar>
                     <AvatarImage
-                      src="https://picsum.photos/seed/user/32/32"
-                      alt="@user"
+                      src={user?.photoURL || "https://picsum.photos/seed/user/32/32"}
+                      alt={user?.displayName || 'user'}
                     />
-                    <AvatarFallback>U</AvatarFallback>
+                    <AvatarFallback>{user?.displayName?.[0] || 'U'}</AvatarFallback>
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuLabel>{user?.displayName || 'My Account'}</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>Settings</DropdownMenuItem>
                 <DropdownMenuItem>Support</DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <Link href="/">Logout</Link>
+                <DropdownMenuItem onClick={handleSignOut}>
+                  Logout
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -98,6 +117,23 @@ export default function DashboardPageClient({
 }: {
   presentations: Presentation[];
 }) {
+  const { user, auth, loading } = useUser();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/');
+    }
+  }, [user, loading, router]);
+
+  if (loading || !user) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <p>Loading...</p>
+      </div>
+    );
+  }
+  
   return (
     <DashboardProvider presentations={presentations}>
       <DashboardLayout>

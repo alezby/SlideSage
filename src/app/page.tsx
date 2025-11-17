@@ -1,3 +1,4 @@
+'use client';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import {
@@ -8,8 +9,35 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Presentation } from 'lucide-react';
+import { useUser } from '@/firebase';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
 export default function Home() {
+  const { user, auth } = useUser();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (user) {
+      router.push('/dashboard');
+    }
+  }, [user, router]);
+
+  const handleGoogleSignIn = async () => {
+    if (auth) {
+      const { getAuth, GoogleAuthProvider, signInWithPopup } = await import(
+        'firebase/auth'
+      );
+      const provider = new GoogleAuthProvider();
+      try {
+        await signInWithPopup(auth, provider);
+        router.push('/dashboard');
+      } catch (error) {
+        console.error('Error signing in with Google', error);
+      }
+    }
+  };
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md shadow-lg">
@@ -29,8 +57,8 @@ export default function Home() {
             Connect your Google account to start analyzing your presentations for
             brand consistency, clarity, and impact.
           </p>
-          <Button asChild className="w-full" size="lg">
-            <Link href="/dashboard">Connect with Google</Link>
+          <Button onClick={handleGoogleSignIn} className="w-full" size="lg">
+            Connect with Google
           </Button>
           <p className="text-xs text-muted-foreground">
             We&apos;ll request access to your Google Slides.
