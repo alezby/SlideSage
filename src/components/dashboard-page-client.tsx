@@ -41,12 +41,6 @@ function DashboardLayout({ children }: { children: ReactNode }) {
     }
   };
 
-  useEffect(() => {
-    if (auth && !user) {
-      router.push('/');
-    }
-  }, [user, auth, router]);
-
   return (
     <SidebarProvider defaultOpen={true}>
       <div className="min-h-screen">
@@ -117,7 +111,7 @@ export default function DashboardPageClient({
 }: {
   presentations: Presentation[];
 }) {
-  const { user, auth, loading } = useUser();
+  const { user, loading } = useUser();
   const router = useRouter();
 
   useEffect(() => {
