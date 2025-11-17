@@ -2,7 +2,7 @@
 import { useDashboard, type ChatMessage } from '@/contexts/dashboard-context';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { refineAnalysisWithConversation } from '@/ai/flows/refine-analysis-with-conversational-agent';
+import { conversationalAgent } from '@/ai/flows/conversational-agent';
 import { useToast } from '@/hooks/use-toast';
 import { Send, Loader2, User, Bot } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
@@ -19,6 +19,8 @@ export default function ChatTab() {
     setChatHistory,
     isChatting,
     setIsChatting,
+    setComments,
+    comments,
   } = useDashboard();
   const { toast } = useToast();
   const [userInput, setUserInput] = useState('');
@@ -55,12 +57,27 @@ export default function ChatTab() {
     setIsChatting(true);
 
     try {
-      const result = await refineAnalysisWithConversation({
-        initialPrompt: analysisPrompt,
+      const result = await conversationalAgent({
+        prompt: userInput,
+        slideNumber: currentSlideIndex + 1,
         slideContent: `${currentSlide.title}\n${currentSlide.content}`,
-        conversationHistory: newHistory,
+        analysisPrompt,
+        history: chatHistory,
       });
-      setChatHistory(result.conversationHistory);
+
+      // Update chat history with the agent's response
+      const agentResponse: ChatMessage = { role: 'assistant', content: result.response };
+      setChatHistory([...newHistory, agentResponse]);
+
+      // If the agent added a comment, update the comments list
+      if (result.commentAdded) {
+        setComments(prevComments => [...prevComments, result.commentAdded!].sort((a,b) => a.slideNumber - b.slideNumber));
+        toast({
+          title: 'Comment Added',
+          description: `A new comment was added to slide ${result.commentAdded.slideNumber}.`,
+        });
+      }
+
     } catch (error) {
       console.error(error);
       toast({
@@ -68,7 +85,7 @@ export default function ChatTab() {
         description: 'Something went wrong.',
         variant: 'destructive',
       });
-      setChatHistory(chatHistory);
+      setChatHistory(chatHistory); // Revert history on error
     } finally {
       setIsChatting(false);
     }
@@ -82,7 +99,7 @@ export default function ChatTab() {
             {chatHistory.length === 0 && (
               <div className="text-center py-8 text-muted-foreground">
                 <p>
-                  Chat with the AI to refine the analysis for the current slide.
+                  Ask the agent to add comments or refine analysis for the current slide.
                 </p>
               </div>
             )}
