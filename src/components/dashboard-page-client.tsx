@@ -30,7 +30,6 @@ import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
 function DashboardLayout({ children }: { children: ReactNode }) {
-  const { selectedPresentation } = useDashboard();
   const { user, auth } = useUser();
   const router = useRouter();
 
@@ -41,55 +40,6 @@ function DashboardLayout({ children }: { children: ReactNode }) {
       router.push('/');
     }
   };
-
-  if (!selectedPresentation) {
-    return (
-      <div className="flex flex-col min-h-screen">
-        <header className="sticky top-0 z-10 flex h-14 items-center justify-between gap-4 border-b bg-background/80 px-4 backdrop-blur-sm sm:px-6">
-          <div className="flex items-center gap-2">
-            <PresentationIcon className="h-6 w-6 text-primary" />
-            <h1 className="font-headline text-xl font-semibold">Slide Sage</h1>
-          </div>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="outline"
-                size="icon"
-                className="overflow-hidden rounded-full"
-              >
-                <Avatar>
-                  <AvatarImage
-                    src={user?.photoURL || "https://picsum.photos/seed/user/32/32"}
-                    alt={user?.displayName || 'user'}
-                  />
-                  <AvatarFallback>{user?.displayName?.[0] || 'U'}</AvatarFallback>
-                </Avatar>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>{user?.displayName || 'My Account'}</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>Settings</DropdownMenuItem>
-              <DropdownMenuItem>Support</DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleSignOut}>
-                Logout
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </header>
-        <main className="flex flex-1 items-center justify-center">
-            <div className="flex flex-col items-center gap-4 text-center">
-                <h2 className="text-2xl font-semibold">Welcome to Slide Sage</h2>
-                <p className="text-muted-foreground">
-                Connect your Google Drive to get started.
-                </p>
-                <PresentationSelector />
-            </div>
-        </main>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen">
@@ -147,6 +97,35 @@ function DashboardLayout({ children }: { children: ReactNode }) {
   );
 }
 
+function DashboardContent() {
+    const { selectedPresentation } = useDashboard();
+
+    if (!selectedPresentation) {
+        return (
+             <div className="flex h-full min-h-[80vh] flex-col items-center justify-center rounded-lg border-2 border-dashed">
+                <div className="flex flex-col items-center gap-4 text-center">
+                    <h2 className="text-2xl font-semibold">Welcome to Slide Sage</h2>
+                    <p className="max-w-md text-muted-foreground">
+                        To get started, connect your Google Drive account and select a presentation from the sidebar.
+                    </p>
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 h-full">
+            <div className="lg:col-span-3 xl:col-span-4">
+              <SlideViewer />
+            </div>
+            <div className="lg:col-span-2 xl:col-span-1">
+              <AnalysisPanel />
+            </div>
+        </div>
+    );
+}
+
+
 export default function DashboardPageClient({
   presentations,
 }: {
@@ -173,14 +152,7 @@ export default function DashboardPageClient({
     <DashboardProvider presentations={presentations}>
       <SidebarProvider defaultOpen={true}>
         <DashboardLayout>
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 h-full">
-            <div className="lg:col-span-3 xl:col-span-4">
-              <SlideViewer />
-            </div>
-            <div className="lg:col-span-2 xl:col-span-1">
-              <AnalysisPanel />
-            </div>
-          </div>
+            <DashboardContent />
         </DashboardLayout>
       </SidebarProvider>
     </DashboardProvider>
