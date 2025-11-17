@@ -17,7 +17,6 @@ export default function Home() {
   const { user, signInWithGoogle, loading } = useUser();
   const router = useRouter();
   const [hostname, setHostname] = useState('');
-  const { toast } = useToast();
   const [isSigningIn, setIsSigningIn] = useState(false);
 
   useEffect(() => {
@@ -35,12 +34,8 @@ export default function Home() {
   const handleSignIn = async () => {
     setIsSigningIn(true);
     try {
-      const userCredential = await signInWithGoogle();
-      if (userCredential) {
-        router.push('/dashboard');
-      } else {
-        throw new Error('Sign in failed');
-      }
+      await signInWithGoogle();
+      // The useEffect will handle the redirect
     } catch (error: any) {
       console.error('Sign-in failed:', error);
       toast({
@@ -52,7 +47,6 @@ export default function Home() {
       setIsSigningIn(false);
     }
   };
-
 
   if (loading || user) {
     return (
@@ -81,7 +75,7 @@ export default function Home() {
             Connect your Google account to start analyzing your presentations
             for brand consistency, clarity, and impact.
           </p>
-          <Button onClick={handleSignIn} className="w-full" size="lg" disabled={loading || isSigningIn}>
+          <Button onClick={handleSignIn} className="w-full" size="lg" disabled={isSigningIn}>
             {isSigningIn ? <Loader2 className="animate-spin" /> : 'Connect with Google'}
           </Button>
           {hostname && (
