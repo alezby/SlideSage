@@ -61,9 +61,9 @@ function DashboardLayout({ children }: { children: ReactNode }) {
           </SidebarContent>
         </Sidebar>
         <SidebarInset>
-          <header className="sticky top-0 z-10 flex h-14 items-center gap-4 border-b bg-background/80 px-4 backdrop-blur-sm sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6 sm:py-4">
+          <header className="sticky top-0 z-10 flex h-14 items-center justify-between gap-4 border-b bg-background/80 px-4 backdrop-blur-sm sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6 sm:py-4">
             <SidebarTrigger className="md:hidden" />
-            <div className="relative ml-auto flex-1 md:grow-0"></div>
+            <div className="flex-1"></div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -96,7 +96,7 @@ function DashboardLayout({ children }: { children: ReactNode }) {
             {selectedPresentation ? (
               children
             ) : (
-              <div className="flex h-[80vh] items-center justify-center rounded-lg border border-dashed text-center">
+              <div className="flex pt-24 justify-center rounded-lg text-center">
                 <div className="flex flex-col items-center gap-4">
                   <h2 className="text-2xl font-semibold">Welcome to Slide Sage</h2>
                   <p className="text-muted-foreground">
