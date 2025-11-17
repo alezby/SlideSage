@@ -12,6 +12,8 @@ import { Presentation } from 'lucide-react';
 import { useUser } from '@/firebase';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+
 
 export default function Home() {
   const { user, auth } = useUser();
@@ -32,9 +34,6 @@ export default function Home() {
 
   const handleGoogleSignIn = async () => {
     if (auth) {
-      const { getAuth, GoogleAuthProvider, signInWithPopup } = await import(
-        'firebase/auth'
-      );
       const provider = new GoogleAuthProvider();
       try {
         await signInWithPopup(auth, provider);
