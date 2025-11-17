@@ -1,5 +1,6 @@
 'use client';
 import { useDashboard } from '@/contexts/dashboard-context';
+import AnalysisPanel from './analysis-panel';
 
 export default function SlideViewer() {
   const { selectedPresentation } = useDashboard();
@@ -12,8 +13,8 @@ export default function SlideViewer() {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 h-full">
-      <div className="lg:col-span-3 xl:col-span-4 h-full">
-        <div className="aspect-video w-full h-full bg-black rounded-lg overflow-hidden shadow-lg">
+      <div className="lg:col-span-3 h-full">
+        <div className="aspect-video w-full bg-black rounded-lg overflow-hidden shadow-lg">
           <iframe
             src={embedUrl}
             frameBorder="0"
@@ -22,14 +23,15 @@ export default function SlideViewer() {
             allowFullScreen={true}
           ></iframe>
         </div>
-      </div>
-      <div className="lg:col-span-2 xl:col-span-1">
         <div className="text-center text-muted-foreground p-4">
-          <p className="font-bold">Editing Tip:</p>
-          <p className="text-sm">
-            Use the embedded slide controls to navigate. The AI panel on the right will update to the current slide you are viewing.
-          </p>
+            <p className="font-bold">Editing Tip:</p>
+            <p className="text-sm">
+                Use the embedded slide controls to navigate. You may need to manually update the current slide in the "Refine" tab for the AI to have the correct context.
+            </p>
         </div>
+      </div>
+      <div className="lg:col-span-2 h-full">
+        <AnalysisPanel />
       </div>
     </div>
   );
