@@ -24,8 +24,8 @@ export function useUser() {
     return () => unsubscribe?.();
   }, [auth]);
 
-  const signInWithGoogle = async () => {
-    if (!auth) return;
+  const signInWithGoogle = async (): Promise<UserCredential | null> => {
+    if (!auth) return null;
 
     const provider = new GoogleAuthProvider();
     provider.addScope(SLIDES_SCOPE);
@@ -38,6 +38,7 @@ export function useUser() {
         sessionStorage.setItem('google_access_token', credential.accessToken);
       }
       setUser(result.user);
+      return result;
     } catch (error) {
       console.error('Error during Google sign-in:', error);
       // Re-throw the error if you want calling components to handle it

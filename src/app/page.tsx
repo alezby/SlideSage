@@ -11,11 +11,14 @@ import { useUser } from '@/firebase';
 import { Presentation, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { useToast } from '@/hooks/use-toast';
 
 export default function Home() {
   const { user, signInWithGoogle, loading } = useUser();
   const router = useRouter();
   const [hostname, setHostname] = useState('');
+  const { toast } = useToast();
+  const [isSigningIn, setIsSigningIn] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -28,6 +31,28 @@ export default function Home() {
       setHostname(window.location.hostname);
     }
   }, []);
+  
+  const handleSignIn = async () => {
+    setIsSigningIn(true);
+    try {
+      const userCredential = await signInWithGoogle();
+      if (userCredential) {
+        router.push('/dashboard');
+      } else {
+        throw new Error('Sign in failed');
+      }
+    } catch (error: any) {
+      console.error('Sign-in failed:', error);
+      toast({
+        title: 'Sign-in Failed',
+        description: error.message || 'An unexpected error occurred during sign-in.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSigningIn(false);
+    }
+  };
+
 
   if (loading || user) {
     return (
@@ -56,8 +81,8 @@ export default function Home() {
             Connect your Google account to start analyzing your presentations
             for brand consistency, clarity, and impact.
           </p>
-          <Button onClick={signInWithGoogle} className="w-full" size="lg" disabled={loading}>
-            {loading ? <Loader2 className="animate-spin" /> : 'Connect with Google'}
+          <Button onClick={handleSignIn} className="w-full" size="lg" disabled={loading || isSigningIn}>
+            {isSigningIn ? <Loader2 className="animate-spin" /> : 'Connect with Google'}
           </Button>
           {hostname && (
             <div className="mt-4 text-center text-sm text-muted-foreground">
