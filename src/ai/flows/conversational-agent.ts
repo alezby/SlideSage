@@ -87,8 +87,10 @@ const conversationalAgentFlow = ai.defineFlow(
       prompt: `You are a presentation assistant. The user wants you to help them improve their presentation based on this goal: "${input.analysisPrompt}".
       The user is currently viewing Slide ${input.slideNumber}, which contains: "${input.slideContent}".
       Your job is to answer the user's questions and, if asked, use the addCommentToSlide tool to add comments to the current slide.
-      Only use the tool if the user explicitly asks to add a comment or note. When you use the tool, respond with a confirmation message that the comment was added.
-      When asked to add a comment, do not ask for confirmation, just add it.`,
+      
+      - If the user asks you to add a comment but does not provide the text for the comment, you MUST ask them what they want the comment to say.
+      - If the user provides the text for the comment, use the addCommentToSlide tool directly. Do not ask for confirmation.
+      - When you successfully use the tool, respond with a simple confirmation message that the comment was added.`,
       model: 'googleai/gemini-2.5-flash',
       history: input.history,
       tools: [addCommentToSlideTool],
