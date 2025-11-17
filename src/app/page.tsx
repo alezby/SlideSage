@@ -11,17 +11,24 @@ import {
 import { Presentation } from 'lucide-react';
 import { useUser } from '@/firebase';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function Home() {
   const { user, auth } = useUser();
   const router = useRouter();
+  const [hostname, setHostname] = useState('');
 
   useEffect(() => {
     if (user) {
       router.push('/dashboard');
     }
   }, [user, router]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setHostname(window.location.hostname);
+    }
+  }, []);
 
   const handleGoogleSignIn = async () => {
     if (auth) {
@@ -60,6 +67,17 @@ export default function Home() {
           <Button onClick={handleGoogleSignIn} className="w-full" size="lg">
             Connect with Google
           </Button>
+          {hostname && (
+            <div className="mt-4 text-center text-sm text-muted-foreground">
+              <p>
+                Please add the following domain to your Firebase project&apos;s
+                authorized domains:
+              </p>
+              <p className="font-bold text-foreground bg-muted p-2 rounded-md mt-1">
+                {hostname}
+              </p>
+            </div>
+          )}
           <p className="text-xs text-muted-foreground">
             We&apos;ll request access to your Google Slides.
           </p>
