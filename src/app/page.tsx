@@ -8,7 +8,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { useUser } from '@/firebase';
-import { Presentation } from 'lucide-react';
+import { Presentation, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -30,7 +30,11 @@ export default function Home() {
   }, []);
 
   if (loading || user) {
-    return null; // Don't render anything while checking auth or redirecting
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
   }
 
   return (
@@ -52,8 +56,8 @@ export default function Home() {
             Connect your Google account to start analyzing your presentations
             for brand consistency, clarity, and impact.
           </p>
-          <Button onClick={signInWithGoogle} className="w-full" size="lg">
-            Connect with Google
+          <Button onClick={signInWithGoogle} className="w-full" size="lg" disabled={loading}>
+            {loading ? <Loader2 className="animate-spin" /> : 'Connect with Google'}
           </Button>
           {hostname && (
             <div className="mt-4 text-center text-sm text-muted-foreground">

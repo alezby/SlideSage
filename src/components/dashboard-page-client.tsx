@@ -13,7 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Presentation as PresentationIcon } from 'lucide-react';
+import { Presentation as PresentationIcon, Loader2 } from 'lucide-react';
 import {
   SidebarProvider,
   Sidebar,
@@ -129,7 +129,7 @@ export default function DashboardPageClient({
   if (loading || !user) {
     return (
       <div className="flex h-screen items-center justify-center">
-        <p>Loading...</p>
+        <Loader2 className="h-8 w-8 animate-spin" />
       </div>
     );
   }
