@@ -1,5 +1,4 @@
 import type { Presentation, Slide } from '@/lib/data';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 const SLIDES_API_URL = 'https://slides.googleapis.com/v1/presentations';
 const DRIVE_API_URL = 'https://www.googleapis.com/drive/v3/files';
@@ -32,13 +31,18 @@ export async function getPresentations(token: string): Promise<Presentation[]> {
   );
 
   if (!response.ok) {
-    throw new Error('Failed to fetch presentations');
+    const errorBody = await response.text();
+    console.error('Failed to fetch presentations from Drive:', response.status, errorBody);
+    throw new Error(`Failed to fetch presentations. Status: ${response.status}`);
   }
 
   const data = await response.json();
+  if (!data.files) {
+    return [];
+  }
 
-  const presentations: Presentation[] = await Promise.all(
-    data.files.map(async (file: any): Promise<Presentation> => {
+  const presentationPromises: Promise<Presentation | null>[] = data.files.map(async (file: any): Promise<Presentation | null> => {
+    try {
       const presResponse = await fetch(`${SLIDES_API_URL}/${file.id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -46,8 +50,13 @@ export async function getPresentations(token: string): Promise<Presentation[]> {
       });
 
       if (!presResponse.ok) {
-        console.error(`Failed to fetch presentation details for ${file.name}`);
-        // Return a presentation object with an empty slides array or handle as needed
+        console.error(`Failed to fetch presentation details for ${file.name} (${file.id}). Status: ${presResponse.status}`);
+        return null;
+      }
+      
+      const presData = await presResponse.json();
+
+      if (!presData.slides || presData.slides.length === 0) {
         return {
           id: file.id,
           title: file.name,
@@ -55,11 +64,8 @@ export async function getPresentations(token: string): Promise<Presentation[]> {
           slides: [],
         };
       }
-      
-      const presData = await presResponse.json();
 
-      const slides: Slide[] = await Promise.all(
-        (presData.slides || []).map(async (slideData: any, index: number): Promise<Slide> => {
+      const slides: Slide[] = presData.slides.map((slideData: any, index: number): Slide => {
           const pageObjectId = slideData.objectId;
           const content = extractTextFromPage(slideData);
           const title = content.split('\n')[0] || `Slide ${index + 1}`;
@@ -75,8 +81,7 @@ export async function getPresentations(token: string): Promise<Presentation[]> {
               imageHint: 'presentation slide',
             },
           };
-        })
-      );
+        });
 
       return {
         id: file.id,
@@ -84,8 +89,14 @@ export async function getPresentations(token: string): Promise<Presentation[]> {
         thumbnailUrl: file.thumbnailLink,
         slides,
       };
-    })
-  );
+    } catch(error) {
+      console.error(`Error processing presentation ${file.name} (${file.id}):`, error);
+      return null;
+    }
+  });
 
-  return presentations.filter(p => p.slides.length > 0);
+  const resolvedPresentations = await Promise.all(presentationPromises);
+  
+  // Filter out nulls and presentations with no slides
+  return resolvedPresentations.filter((p): p is Presentation => p !== null && p.slides.length > 0);
 }
