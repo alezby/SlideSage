@@ -217,3 +217,30 @@ export async function getPresentations(token: string): Promise<Presentation[]> {
   // Filter out nulls and presentations with no slides
   return resolvedPresentations.filter((p): p is Presentation => p !== null && p.slides.length > 0);
 }
+
+export async function getSlideThumbnail(
+  token: string,
+  presentationId: string,
+  pageObjectId: string
+): Promise<string | null> {
+  const url = `${SLIDES_API_URL}/${presentationId}/pages/${pageObjectId}/thumbnail`;
+  
+  try {
+    const response = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      console.error(`Failed to fetch thumbnail for slide ${pageObjectId}:`, response.status);
+      return null;
+    }
+
+    const data = await response.json();
+    return data.contentUrl || null;
+  } catch (error) {
+    console.error(`Error fetching thumbnail for slide ${pageObjectId}:`, error);
+    return null;
+  }
+}
